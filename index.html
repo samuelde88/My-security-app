@@ -5,107 +5,279 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Security APP</title>
     <style>
-        :root { --orange: #FF8C00; --white: #ffffff; --gray: #f4f4f4; }
-        
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--white); margin: 0; display: flex; flex-direction: column; height: 100vh;
-            border: 8px solid var(--orange); box-sizing: border-box;
+        :root {
+            --orange: #FF8C00;
+            --orange-glow: rgba(255, 140, 0, 0.4);
+            --bg: #ffffff;
+            --text: #1a1a1a;
+            --glass: rgba(255, 255, 255, 0.9);
         }
 
-        /* Pantalla de Registro */
-        #registration-screen { 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; text-align: center;
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            border: 12px solid var(--orange);
+            box-sizing: border-box;
+            transition: all 0.3s ease;
         }
 
-        /* Pantalla Principal (Oculta al inicio) */
-        #main-app { display: none; flex-direction: column; height: 100%; padding: 20px; }
-
-        h1 { color: var(--orange); text-transform: uppercase; font-size: 1.5rem; margin-bottom: 5px; }
-        .welcome-text { font-size: 1.2rem; margin-bottom: 30px; color: #333; }
-
-        input {
-            width: 80%; padding: 12px; margin: 10px 0; border: 2px solid var(--orange); border-radius: 8px; font-size: 1rem;
+        /* Header con Rueda */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            z-index: 10;
         }
 
-        .btn {
-            width: 100%; padding: 20px; margin: 10px 0; border: none; border-radius: 12px;
-            font-size: 1.3rem; font-weight: bold; cursor: pointer; text-decoration: none;
-            display: flex; align-items: center; justify-content: center; transition: 0.2s;
+        .header h1 {
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            margin: 0;
+            font-weight: 900;
+            color: var(--orange);
         }
 
-        .btn-save { background-color: var(--orange); color: white; }
-        .btn-112 { background-color: #ff4444; color: white; border: 4px solid var(--orange); }
-        .btn-family { background-color: var(--white); color: var(--orange); border: 4px solid var(--orange); }
-        
-        .btn:active { transform: scale(0.95); }
+        .settings-btn {
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: transform 0.5s ease;
+        }
 
-        #config-link { color: var(--orange); font-size: 0.8rem; text-decoration: underline; margin-top: auto; text-align: center; cursor: pointer; }
+        .settings-btn:hover { transform: rotate(90deg); }
+
+        /* Contenedores de Pantalla */
+        .screen {
+            display: none;
+            flex-direction: column;
+            padding: 25px;
+            flex-grow: 1;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Bienvenida */
+        .welcome-section { text-align: center; margin-bottom: 30px; }
+        .welcome-section h2 { font-size: 1.8rem; margin: 0; font-weight: 300; }
+        .welcome-section span { font-weight: 800; color: var(--orange); }
+
+        /* Botones Modernos */
+        .btn-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            justify-content: center;
+            flex-grow: 1;
+        }
+
+        .action-btn {
+            position: relative;
+            height: 120px;
+            border: none;
+            border-radius: 24px;
+            font-size: 1.4rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
+            overflow: hidden;
+        }
+
+        .btn-sos {
+            background: #ff3b30;
+            color: white;
+            box-shadow: 0 10px 20px rgba(255, 59, 48, 0.3);
+        }
+
+        .btn-family {
+            background: white;
+            color: var(--orange);
+            border: 3px solid var(--orange);
+            box-shadow: 0 10px 20px var(--orange-glow);
+        }
+
+        .action-btn:active { transform: scale(0.92); filter: brightness(1.1); }
+
+        .btn-subtitle { font-size: 0.8rem; font-weight: 400; opacity: 0.8; margin-top: 5px; }
+
+        /* Formulario Ajustes */
+        .form-group { display: flex; flex-direction: column; margin-bottom: 15px; }
+        label { font-size: 0.8rem; font-weight: 700; margin-bottom: 5px; color: var(--orange); text-transform: uppercase; }
+        input, select {
+            background: #f8f8f8;
+            border: 2px solid #eee;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.3s;
+        }
+        input:focus { border-color: var(--orange); }
+
+        .save-btn {
+            background: var(--orange);
+            color: white;
+            padding: 20px;
+            border: none;
+            border-radius: 15px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <div id="registration-screen">
-        <h1>My Security APP</h1>
-        <p>Configura tu perfil de seguridad</p>
-        <input type="text" id="reg-name" placeholder="Tu Nombre">
-        <input type="number" id="reg-age" placeholder="Tu Edad">
-        <input type="tel" id="reg-family" placeholder="Teléfono Familiar (ej. 600000000)">
-        <button class="btn btn-save" onclick="saveData()">EMPEZAR</button>
+    <div class="header">
+        <div style="width: 30px;"></div>
+        <h1>SECURITY <span style="color:#333">PRO</span></h1>
+        <div class="settings-btn" onclick="openSettings()">⚙️</div>
     </div>
 
-    <div id="main-app">
-        <h1>My Security APP</h1>
-        <div class="welcome-text" id="welcome-msg">Bienvenid@, </div>
+    <div id="main-screen" class="screen">
+        <div class="welcome-section">
+            <h2 id="txt-greet">Hola, <span id="user-display">Samu</span></h2>
+        </div>
         
-        <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
-            <a href="tel:112" class="btn btn-112">🚨 LLAMAR 112</a>
-            <a href="#" id="family-link" class="btn btn-family">📞 FAMILIAR</a>
+        <div class="btn-stack">
+            <a href="tel:112" class="action-btn btn-sos">
+                <span>🚨 112</span>
+                <span class="btn-subtitle" id="txt-sub1">EMERGENCIA MÉDICA / POLICÍA</span>
+            </a>
+
+            <button onclick="sendSOS()" class="action-btn btn-family">
+                <span>📲 SOS FAMILIAR</span>
+                <span class="btn-subtitle" id="txt-sub2">SMS CON UBICACIÓN GPS</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="settings-screen" class="screen">
+        <h2 style="text-align:center" id="txt-set-title">Ajustes</h2>
+        
+        <div class="form-group">
+            <label id="lbl-name">Nombre de Usuario</label>
+            <input type="text" id="name-input" placeholder="Tu nombre">
         </div>
 
-        <div id="config-link" onclick="resetData()">Cambiar configuración</div>
+        <div class="form-group">
+            <label id="lbl-phone">Teléfono de Emergencia</label>
+            <input type="tel" id="phone-input" placeholder="600000000">
+        </div>
+
+        <div class="form-group">
+            <label id="lbl-lang">Idioma / Language</label>
+            <select id="lang-input" onchange="updateLanguage()">
+                <option value="es">Español</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+
+        <button class="save-btn" onclick="saveSettings()" id="btn-save">GUARDAR CAMBIOS</button>
     </div>
 
     <script>
-        // Al cargar la web, vemos si ya hay datos
-        window.onload = function() {
-            if (localStorage.getItem('userName')) {
-                showMainApp();
+        const i18n = {
+            es: {
+                greet: "Hola, ",
+                sub1: "EMERGENCIA MÉDICA / POLICÍA",
+                sub2: "SMS CON UBICACIÓN GPS",
+                set: "Ajustes",
+                name: "Nombre de Usuario",
+                phone: "Teléfono de Emergencia",
+                lang: "Idioma",
+                save: "GUARDAR CAMBIOS",
+                msg: "¡EMERGENCIA! Soy {n}. Mi ubicación real: "
+            },
+            en: {
+                greet: "Hello, ",
+                sub1: "MEDICAL / POLICE EMERGENCY",
+                sub2: "SMS WITH GPS LOCATION",
+                set: "Settings",
+                name: "Username",
+                phone: "Emergency Phone",
+                lang: "Language",
+                save: "SAVE CHANGES",
+                msg: "EMERGENCY! I am {n}. My real-time location: "
             }
         };
 
-        function saveData() {
-            const name = document.getElementById('reg-name').value;
-            const age = document.getElementById('reg-age').value;
-            const family = document.getElementById('reg-family').value;
+        let coords = "";
+        navigator.geolocation.watchPosition(p => {
+            coords = `https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
+        });
 
-            if (name && age && family) {
-                localStorage.setItem('userName', name);
-                localStorage.setItem('userAge', age);
-                localStorage.setItem('familyPhone', family);
-                showMainApp();
+        function openSettings() {
+            document.getElementById('main-screen').classList.remove('active');
+            document.getElementById('settings-screen').classList.add('active');
+        }
+
+        function saveSettings() {
+            const n = document.getElementById('name-input').value;
+            const p = document.getElementById('phone-input').value;
+            const l = document.getElementById('lang-input').value;
+
+            if(n && p) {
+                localStorage.setItem('s_name', n);
+                localStorage.setItem('s_phone', p);
+                localStorage.setItem('s_lang', l);
+                initApp();
+            }
+        }
+
+        function initApp() {
+            const n = localStorage.getItem('s_name');
+            const l = localStorage.getItem('s_lang') || 'es';
+            
+            if(!n) {
+                openSettings();
             } else {
-                alert("Por favor, rellena todos los datos.");
+                document.getElementById('user-display').innerText = n;
+                document.getElementById('name-input').value = n;
+                document.getElementById('phone-input').value = localStorage.getItem('s_phone');
+                document.getElementById('lang-input').value = l;
+                
+                const T = i18n[l];
+                document.getElementById('txt-greet').firstChild.textContent = T.greet;
+                document.getElementById('txt-sub1').innerText = T.sub1;
+                document.getElementById('txt-sub2').innerText = T.sub2;
+                document.getElementById('txt-set-title').innerText = T.set;
+                document.getElementById('lbl-name').innerText = T.name;
+                document.getElementById('lbl-phone').innerText = T.phone;
+                document.getElementById('lbl-lang').innerText = T.lang;
+                document.getElementById('btn-save').innerText = T.save;
+
+                document.getElementById('settings-screen').classList.remove('active');
+                document.getElementById('main-screen').classList.add('active');
             }
         }
 
-        function showMainApp() {
-            document.getElementById('registration-screen').style.display = 'none';
-            document.getElementById('main-app').style.display = 'flex';
-            
-            const name = localStorage.getItem('userName');
-            const familyPhone = localStorage.getItem('familyPhone');
-            
-            document.getElementById('welcome-msg').innerText = `Bienvenid@, ${name}`;
-            document.getElementById('family-link').href = `tel:${familyPhone}`;
+        function sendSOS() {
+            const n = localStorage.getItem('s_name');
+            const p = localStorage.getItem('s_phone');
+            const l = localStorage.getItem('s_lang') || 'es';
+            const m = i18n[l].msg.replace('{n}', n) + coords;
+            window.location.href = `sms:${p}?&body=${encodeURIComponent(m)}`;
         }
 
-        function resetData() {
-            if(confirm("¿Quieres cambiar tus datos?")) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
+        window.onload = initApp;
     </script>
-</body>
+</body>  
 </html>
