@@ -4,167 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Security APP</title>
-    <style>
-        :root { --orange: #FF8C00; --white: #ffffff; --dark: #333; }
-        body { 
-            font-family: 'Segoe UI', sans-serif; background: var(--white); margin: 0; 
-            display: flex; flex-direction: column; height: 100vh;
-            border: 10px solid var(--orange); box-sizing: border-box; overflow: hidden;
-        }
-        
-        /* Cabecera con Rueda */
-        .header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 10px 15px; background: white;
-        }
-        .settings-icon { font-size: 1.5rem; cursor: pointer; color: var(--orange); transition: 0.3s; }
-        .settings-icon:hover { transform: rotate(90deg); }
-
-        /* Pantallas */
-        .screen { display: none; flex-direction: column; height: 100%; padding: 20px; box-sizing: border-box; }
-        .active { display: flex; }
-
-        h1 { color: var(--orange); text-align: center; font-size: 1.4rem; margin: 10px 0; }
-        label { color: var(--orange); font-weight: bold; margin-top: 10px; }
-        input, select { 
-            padding: 12px; margin: 5px 0 15px 0; border: 2px solid var(--orange); border-radius: 8px; font-size: 1rem; 
-        }
-
-        .btn {
-            width: 100%; padding: 18px; margin: 10px 0; border: none; border-radius: 15px;
-            font-size: 1.2rem; font-weight: bold; cursor: pointer; text-decoration: none;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .btn-red { background: #ff4444; color: white; box-shadow: 0 4px 10px rgba(255,68,68,0.3); }
-        .btn-outline { border: 3px solid var(--orange); color: var(--orange); background: white; }
-        .btn-save { background: var(--orange); color: white; }
-
-        .welcome { text-align: center; font-size: 1.1rem; color: var(--dark); margin-bottom: 20px; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="header">
-        <div style="width: 24px;"></div> <h1 style="font-size: 1rem; margin: 0;">MY SECURITY APP</h1>
-        <div class="settings-icon" onclick="showScreen('config')">⚙️</div>
+        <div style="width: 30px;"></div>
+        <h1>SECURITY <span style="color:#333">PRO</span></h1>
+        <div class="settings-btn" onclick="openSettings()">⚙️</div>
     </div>
 
     <div id="main-screen" class="screen">
-        <p class="welcome" id="txt-welcome"></p>
-        <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
-            <a href="tel:112" class="btn btn-red" id="btn-112">🚨 112 EMERGENCY</a>
-            <button class="btn btn-outline" id="btn-family" onclick="sendSMS()">📲 FAMILY ALERT</button>
+        <div class="welcome-area">
+            <h2 id="txt-greet">Hola, <span id="user-display"></span></h2>
+        </div>
+        
+        <div class="btn-stack">
+            <a href="tel:091" class="action-btn btn-police">
+                <span>🚔 POLICÍA 091</span>
+                <span class="btn-subtitle" id="txt-sub0">NACIONAL</span>
+            </a>
+
+            <a href="tel:112" class="action-btn btn-112">
+                <span>🚑 EMERGENCIAS 112</span>
+                <span class="btn-subtitle" id="txt-sub1">MÉDICO / BOMBEROS</span>
+            </a>
+
+            <button onclick="executeFamilyAlert()" class="action-btn btn-family">
+                <span>📲 CONTACTO SOS</span>
+                <span class="btn-subtitle" id="txt-sub2">SMS + LLAMADA PRIVADA</span>
+            </button>
         </div>
     </div>
 
-    <div id="config-screen" class="screen">
-        <h1 id="txt-config-title">AJUSTES</h1>
-        
-        <label id="lbl-name">Nombre:</label>
-        <input type="text" id="inp-name" placeholder="Ej: Samu">
-
-        <label id="lbl-phone">Teléfono Familiar:</label>
-        <input type="tel" id="inp-phone" placeholder="600000000">
-
-        <label id="lbl-lang">Idioma / Language:</label>
-        <select id="inp-lang" onchange="changeLang(this.value)">
-            <option value="es">Español</option>
-            <option value="en">English</option>
-        </select>
-
-        <button class="btn btn-save" id="btn-save" onclick="saveAndExit()">GUARDAR</button>
+    <div id="settings-screen" class="screen">
+        <h2 id="txt-set-title">Ajustes</h2>
+        <div class="form-group">
+            <label id="lbl-name">Nombre</label>
+            <input type="text" id="name-input">
+        </div>
+        <div class="form-group">
+            <label id="lbl-phone">Teléfono Familiar</label>
+            <input type="tel" id="phone-input">
+        </div>
+        <div class="form-group">
+            <label id="lbl-lang">Idioma</label>
+            <select id="lang-input" onchange="updateLanguage()">
+                <option value="es">Español</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+        <button class="save-btn" onclick="saveSettings()" id="btn-save">GUARDAR</button>
     </div>
 
-    <script>
-        const texts = {
-            es: {
-                welcome: "Bienvenid@,",
-                btn112: "🚨 EMERGENCIA 112",
-                btnFamily: "📲 AVISAR FAMILIAR",
-                configTitle: "AJUSTES",
-                lblName: "Tu Nombre:",
-                lblPhone: "Teléfono Familiar:",
-                lblLang: "Idioma:",
-                btnSave: "GUARDAR Y VOLVER",
-                alertMsg: "¡EMERGENCIA! Soy {name}, necesito ayuda. Mi ubicación: "
-            },
-            en: {
-                welcome: "Welcome,",
-                btn112: "🚨 112 EMERGENCY",
-                btnFamily: "📲 ALERT FAMILY",
-                configTitle: "SETTINGS",
-                lblName: "Your Name:",
-                lblPhone: "Family Phone:",
-                lblLang: "Language:",
-                btnSave: "SAVE AND EXIT",
-                alertMsg: "EMERGENCY! I am {name}, I need help. My location: "
-            }
-        };
-
-        let currentLoc = "";
-        navigator.geolocation.watchPosition(p => {
-            currentLoc = `https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
-        });
-
-        window.onload = () => {
-            if (!localStorage.getItem('userName')) {
-                showScreen('config');
-            } else {
-                applyTexts();
-                showScreen('main');
-            }
-        };
-
-        function showScreen(type) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(type + '-screen').classList.add('active');
-        }
-
-        function saveAndExit() {
-            const name = document.getElementById('inp-name').value;
-            const phone = document.getElementById('inp-phone').value;
-            const lang = document.getElementById('inp-lang').value;
-
-            if (name && phone) {
-                localStorage.setItem('userName', name);
-                localStorage.setItem('familyPhone', phone);
-                localStorage.setItem('userLang', lang);
-                applyTexts();
-                showScreen('main');
-            } else {
-                alert("Rellena todos los campos / Fill all fields");
-            }
-        }
-
-        function applyTexts() {
-            const lang = localStorage.getItem('userLang') || 'es';
-            const name = localStorage.getItem('userName');
-            const T = texts[lang];
-
-            document.getElementById('txt-welcome').innerText = `${T.welcome} ${name}`;
-            document.getElementById('btn-112').innerText = T.btn112;
-            document.getElementById('btn-family').innerText = T.btnFamily;
-            document.getElementById('txt-config-title').innerText = T.configTitle;
-            document.getElementById('lbl-name').innerText = T.lblName;
-            document.getElementById('lbl-phone').innerText = T.lblPhone;
-            document.getElementById('lbl-lang').innerText = T.lblLang;
-            document.getElementById('btn-save').innerText = T.btnSave;
-            document.getElementById('inp-lang').value = lang;
-        }
-
-        function changeLang(val) {
-            localStorage.setItem('userLang', val);
-            applyTexts();
-        }
-
-        function sendSMS() {
-            const lang = localStorage.getItem('userLang') || 'es';
-            const name = localStorage.getItem('userName');
-            const phone = localStorage.getItem('familyPhone');
-            const msg = texts[lang].alertMsg.replace('{name}', name) + currentLoc;
-            
-            window.location.href = `sms:${phone}?&body=${encodeURIComponent(msg)}`;
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
