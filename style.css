@@ -1,4 +1,4 @@
-:root {
+root {
     --orange: #FF8C00;
     --red: #ff3b30;
     --green: #34c759;
@@ -18,4 +18,4 @@ body {
     box-sizing: border-box;
 }
 
-/* ... resto del código que te pasé antes ... */
+/* ... resto del código qu
