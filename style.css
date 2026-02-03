@@ -16,7 +16,14 @@ body {
     height: 100vh;
     border: 12px solid var(--orange);
     box-sizing: border-box;
-    
+    /* Añade esto a tu <style> */
+#flashlight-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: white; display: none; z-index: 9999;
+    justify-content: center; align-items: center;
+}
+#flashlight-overlay span { color: black; font-size: 5rem; }
+
 }
 
 
