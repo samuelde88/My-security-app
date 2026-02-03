@@ -4,65 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Security APP</title>
-    <style>
-        :root {
-            --orange: #FF8C00;
-            --red: #ff3b30;
-            --green: #34c759;
-            --bg: #ffffff;
-            --text: #1a1a1a;
-        }
-
-        body {
-            font-family: -apple-system, system-ui, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            border: 12px solid var(--orange);
-            box-sizing: border-box;
-        }
-
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
-        .header h1 { font-size: 0.9rem; letter-spacing: 1px; margin: 0; font-weight: 900; color: var(--orange); }
-        .settings-btn { font-size: 1.8rem; cursor: pointer; }
-
-        .screen { display: none; flex-direction: column; padding: 20px; flex-grow: 1; }
-        .active { display: flex; }
-
-        /* Botones Optimizados */
-        .btn-stack { display: flex; flex-direction: column; gap: 12px; justify-content: center; flex-grow: 1; }
-        
-        .action-btn {
-            height: 100px;
-            border: none;
-            border-radius: 20px;
-            font-size: 1.3rem;
-            font-weight: 800;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            transition: transform 0.1s;
-        }
-
-        .btn-police { background: var(--red); color: white; box-shadow: 0 6px 12px rgba(255,59,48,0.3); }
-        .btn-112 { background: var(--green); color: white; box-shadow: 0 6px 12px rgba(52,199,89,0.3); }
-        .btn-family { background: white; color: var(--orange); border: 4px solid var(--orange); }
-        
-        .action-btn:active { transform: scale(0.96); }
-        .btn-subtitle { font-size: 0.75rem; font-weight: 400; margin-top: 4px; opacity: 0.9; }
-
-        /* Formulario Ajustes */
-        .form-group { display: flex; flex-direction: column; margin-bottom: 12px; }
-        label { font-size: 0.8rem; font-weight: 700; color: var(--orange); margin-bottom: 4px; }
-        input, select { padding: 14px; border: 2px solid #eee; border-radius: 12px; font-size: 1rem; }
-        .save-btn { background: var(--orange); color: white; padding: 18px; border: none; border-radius: 15px; font-weight: 800; margin-top: 15px; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -73,7 +15,7 @@
     </div>
 
     <div id="main-screen" class="screen">
-        <div style="text-align: center; margin-bottom: 10px;">
+        <div class="welcome-area">
             <h2 id="txt-greet">Hola, <span id="user-display"></span></h2>
         </div>
         
@@ -83,20 +25,20 @@
                 <span class="btn-subtitle" id="txt-sub0">NACIONAL</span>
             </a>
 
-            <a href="tel:112" class="btn-112 action-btn">
+            <a href="tel:112" class="action-btn btn-112">
                 <span>🚑 EMERGENCIAS 112</span>
                 <span class="btn-subtitle" id="txt-sub1">MÉDICO / BOMBEROS</span>
             </a>
 
             <button onclick="executeFamilyAlert()" class="action-btn btn-family">
                 <span>📲 CONTACTO SOS</span>
-                <span class="btn-subtitle" id="txt-sub2">SMS + LLAMADA PRIVADA</span>
+                <span class="btn-subtitle" id="txt-sub2">SMS + LLAMADA</span>
             </button>
         </div>
     </div>
 
     <div id="settings-screen" class="screen">
-        <h2 style="text-align:center" id="txt-set-title">Ajustes</h2>
+        <h2 id="txt-set-title">Ajustes</h2>
         <div class="form-group">
             <label id="lbl-name">Nombre</label>
             <input type="text" id="name-input">
@@ -115,67 +57,6 @@
         <button class="save-btn" onclick="saveSettings()" id="btn-save">GUARDAR</button>
     </div>
 
-    <script>
-        const i18n = {
-            es: { greet: "Hola, ", sub0: "POLICÍA NACIONAL", sub1: "MÉDICO / BOMBEROS", sub2: "SMS UBICACIÓN + LLAMADA", set: "Ajustes", name: "Tu Nombre", phone: "Teléfono Familiar", lang: "Idioma", save: "GUARDAR AJUSTES", msg: "¡EMERGENCIA! Soy {n}. Mi ubicación exacta: " },
-            en: { greet: "Hello, ", sub0: "NATIONAL POLICE", sub1: "MEDICAL / FIRE", sub2: "SMS LOCATION + CALL", set: "Settings", name: "Your Name", phone: "Family Phone", lang: "Language", save: "SAVE SETTINGS", msg: "EMERGENCY! I am {n}. My exact location: " }
-        };
-
-        let currentCoords = "Obteniendo...";
-        navigator.geolocation.watchPosition(
-            p => { currentCoords = `https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`; },
-            e => { console.error(e); },
-            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-        );
-
-        function openSettings() {
-            document.getElementById('main-screen').classList.remove('active');
-            document.getElementById('settings-screen').classList.add('active');
-        }
-
-        function saveSettings() {
-            const n = document.getElementById('name-input').value;
-            const p = document.getElementById('phone-input').value;
-            const l = document.getElementById('lang-input').value;
-            if(n && p) {
-                localStorage.setItem('s_name', n);
-                localStorage.setItem('s_phone', p);
-                localStorage.setItem('s_lang', l);
-                initApp();
-            }
-        }
-
-        function initApp() {
-            const n = localStorage.getItem('s_name');
-            const l = localStorage.getItem('s_lang') || 'es';
-            if(!n) { openSettings(); } 
-            else {
-                document.getElementById('user-display').innerText = n;
-                const T = i18n[l];
-                document.getElementById('txt-greet').firstChild.textContent = T.greet;
-                document.getElementById('txt-sub0').innerText = T.sub0;
-                document.getElementById('txt-sub1').innerText = T.sub1;
-                document.getElementById('txt-sub2').innerText = T.sub2;
-                document.getElementById('txt-set-title').innerText = T.set;
-                document.getElementById('lbl-name').innerText = T.name;
-                document.getElementById('lbl-phone').innerText = T.phone;
-                document.getElementById('lbl-lang').innerText = T.lang;
-                document.getElementById('btn-save').innerText = T.save;
-                document.getElementById('settings-screen').classList.remove('active');
-                document.getElementById('main-screen').classList.add('active');
-            }
-        }
-
-        function executeFamilyAlert() {
-            const n = localStorage.getItem('s_name');
-            const p = localStorage.getItem('s_phone');
-            const l = localStorage.getItem('s_lang') || 'es';
-            const m = i18n[l].msg.replace('{n}', n) + currentCoords;
-            window.location.href = `sms:${p}?&body=${encodeURIComponent(m)}`;
-            setTimeout(() => { window.location.href = `tel:${p}`; }, 2000);
-        }
-
-        window.onload = initApp;
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
