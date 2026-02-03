@@ -62,6 +62,34 @@ function executeFamilyAlert() {
     
     // A los 2.5 segundos, la llamada
     setTimeout(() => { window.location.href = `tel:${p}`; }, 2500);
+/* Sustituye la función toggleFlash en tu <script> */
+async function toggleFlash() {
+    const overlay = document.getElementById('flashlight-overlay');
+    
+    // 1. Intentamos el hardware (Flash real)
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        const track = stream.getVideoTracks()[0];
+        const capabilities = track.getCapabilities();
+        if (capabilities.torch) {
+            await track.applyConstraints({ advanced: [{ torch: true }] });
+        }
+    } catch (e) {
+        console.log("Flash real bloqueado o no disponible");
+    }
+
+    // 2. Activamos el Flash de Pantalla (Efectivo y seguro)
+    overlay.style.display = 'flex';
+    
+    // Cerramos al tocar cualquier parte de la pantalla blanca
+    overlay.onclick = function() {
+        overlay.style.display = 'none';
+        // Intentamos apagar la cámara si se abrió
+        location.reload(); 
+    };
 }
+
+}
+
 
 window.onload = initApp;
